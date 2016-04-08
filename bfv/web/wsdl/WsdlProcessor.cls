@@ -20,28 +20,21 @@ class bfv.web.wsdl.WsdlProcessor:
   define private variable targetDoc as handle no-undo.
   define private variable sourceRootNode as handle no-undo.
   define private variable targetRootNode as handle no-undo.
-  define private variable tmpnode as handle no-undo.
-  define private variable attrnode as handle no-undo.
-  define private variable valuenode as handle no-undo.
-  define private variable targetnode as handle no-undo.
-  define private variable targetvaluenode as handle no-undo.
-  define private variable currentpath as character no-undo.
+  define private variable tmpNode as handle no-undo.
+  define private variable valueNode as handle no-undo.
+  define private variable targetValueNode as handle no-undo.
+  define private variable currentPath as character no-undo.
   define private variable decorator as IWsdlDecorator no-undo.
   define private variable xmlSchemaPrefix as character no-undo.
   
-  
-  constructor WsdlProcessor():
-    
-  end.
   
   destructor WsdlProcessor():
     delete object sourceDoc no-error.
     delete object targetDoc no-error.
     delete object sourceRootNode no-error.
-    delete object tmpnode no-error.
-    delete object attrnode no-error.
-    delete object valuenode no-error.
-    delete object targetvaluenode no-error.
+    delete object tmpNode no-error.
+    delete object valueNode no-error.
+    delete object targetValueNode no-error.
   end.
   
   
@@ -61,10 +54,9 @@ class bfv.web.wsdl.WsdlProcessor:
   
   
   method private void init():
-    create x-noderef tmpnode.
-    create x-noderef attrnode.
-    create x-noderef valuenode.
-    create x-noderef targetvaluenode.
+    create x-noderef tmpNode.
+    create x-noderef valueNode.
+    create x-noderef targetValueNode.
   end method.
   
   
@@ -74,7 +66,7 @@ class bfv.web.wsdl.WsdlProcessor:
     define variable wsdlfile as character no-undo.
     
     if (wsdl begins "file:///") then do:
-      wsdlfile = substring(wsdl, 9).
+      wsdlfile = substring(wsdl, if (opsys = "win32") then 9 else 8).
       copy-lob file wsdlfile to wsdl.
     end.
     
@@ -104,10 +96,11 @@ class bfv.web.wsdl.WsdlProcessor:
     targetRootNode = copyNode(sourceRootNode, ?).
     targetDoc:append-child(targetRootNode).
     
+    /* iterate children, call traverseNode for element's */
     do i = 1 to sourceRootNode:num-children:
-      sourceRootNode:get-child(tmpnode, i).
-      if (tmpnode:subtype = "element") then
-        traverseNode(tmpnode, targetRootNode).  
+      sourceRootNode:get-child(tmpNode, i).
+      if (tmpNode:subtype = "element") then
+        traverseNode(tmpNode, targetRootNode).  
     end.
     
   end method.
@@ -122,24 +115,27 @@ class bfv.web.wsdl.WsdlProcessor:
     
     create x-noderef copiednode.
     
-    pathWasExpanded = addToCurrentPath(currentsource).
+    pathWasExpanded = addTocurrentPath(currentsource).
     getXmlSchemaPrefix(currentsource).
     
-    // copy first
+    /* copy first */
     copiednode = copyNode(currentsource, ?).
     currenttarget:append-child(copiednode).
     
-    if (currentsource:num-children > 0) then
+    /* recurse through childs */
+    if (currentsource:num-children > 0) then do:
       create x-noderef childnode.
       
-    do i = 1 to currentsource:num-children:
-      currentsource:get-child(childnode, i).
-      if (childnode:subtype = "element") then 
-        traverseNode(childnode, copiednode). 
-    end.
+      do i = 1 to currentsource:num-children:
+        currentsource:get-child(childnode, i).
+        if (childnode:subtype = "element") then 
+          traverseNode(childnode, copiednode). 
+      end.
     
+    end.
+        
     if (pathWasExpanded) then
-      removeFromCurrentPath(currentsource).
+      removeFromcurrentPath(currentsource).
     
     finally:
       delete object childnode no-error.
@@ -153,7 +149,7 @@ class bfv.web.wsdl.WsdlProcessor:
     
     define variable i as integer no-undo.
     define variable numEntries as integer no-undo.
-    define variable attrname as character no-undo.
+    define variable attributeName as character no-undo.
     define variable hasNameAtrribute as logical no-undo.
     
     
@@ -166,24 +162,24 @@ class bfv.web.wsdl.WsdlProcessor:
     numEntries = num-entries(sourceNode:attribute-names).
     do i = 1 to numEntries:
       
-      attrname = entry(i, sourceNode:attribute-names).    
-      if (attrname = "name") then
+      attributeName = entry(i, sourceNode:attribute-names).    
+      if (attributeName = "name") then
         hasNameAtrribute = true.
         
-      targetNode:set-attribute(attrname, sourceNode:get-attribute(attrname)).
+      targetNode:set-attribute(attributeName, sourceNode:get-attribute(attributeName)).
     end.
     
     if (valid-object(decorator) and hasNameAtrribute) then 
-      decorator:Decorate(targetNode, currentpath).
+      decorator:Decorate(targetNode, currentPath).
     
     /* copy content */   
     do i = 1 to sourceNode:num-children:
       
-      sourceNode:get-child(valuenode, i).      
-      if (valuenode:subtype = "text" and trim(valuenode:node-value) > "") then do:
-        targetDoc:create-node(targetvaluenode, ?, "text").
-        targetvaluenode:node-value =  trim(valuenode:node-value).
-        targetNode:append-child(targetvaluenode).
+      sourceNode:get-child(valueNode, i).      
+      if (valueNode:subtype = "text" and trim(valueNode:node-value) > "") then do:
+        targetDoc:create-node(targetValueNode, ?, "text").
+        targetValueNode:node-value =  trim(valueNode:node-value).
+        targetNode:append-child(targetValueNode).
       end.
       
     end.
@@ -204,21 +200,21 @@ class bfv.web.wsdl.WsdlProcessor:
   end method.
   
   
-  method private logical addToCurrentPath(node as handle): 
+  method private logical addTocurrentPath(node as handle): 
     
     define variable hasNameAttribute as logical no-undo.
     
     hasNameAttribute = (lookup("name", node:attribute-names) > 0).
     if (hasNameAttribute) then
-      currentpath = currentpath + "/" + node:get-attribute("name").
+      currentPath = currentPath + "/" + node:get-attribute("name").
     
     return hasNameAttribute.
     
   end method.
   
   
-  method private void removeFromCurrentPath(node as handle):    
-    currentpath = substring(currentpath, 1, r-index(currentpath, "/") - 1).
+  method private void removeFromcurrentPath(node as handle):    
+    currentPath = substring(currentPath, 1, r-index(currentPath, "/") - 1).
   end method.
   
   
@@ -254,6 +250,5 @@ class bfv.web.wsdl.WsdlProcessor:
     return xmlSchemaPrefix.
       
   end method.
-  
   
 end class.
