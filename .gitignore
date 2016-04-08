@@ -1,0 +1,3 @@
+*.r
+bfv/web/wsdl/testdata/
+.settings/
