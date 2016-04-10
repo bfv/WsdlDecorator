@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions name="crm" targetNamespace="http://bfv.io/oe/crm" xmlns:S3="http://bfv.io/oe/crm" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:prodata="urn:schemas-progress-com:xml-prodata:0001" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://bfv.io/oe/crm" xmlns:S2="http://bfv.io/oe/crm/crm" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:S1="urn:soap-fault:details" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
+<wsdl:documentation>Author=bfv, EncodingType=DOC_LITERAL, Proxygen_Product=Progress Version 11.6</wsdl:documentation>
+  <wsdl:types>
+<schema elementFormDefault="unqualified" targetNamespace="urn:soap-fault:details" xmlns="http://www.w3.org/2001/XMLSchema"><element name="FaultDetail"><complexType><sequence><element name="errorMessage" type="xsd:string"/><element name="requestID" type="xsd:string"/></sequence></complexType></element></schema>
+<schema elementFormDefault="qualified" targetNamespace="http://bfv.io/oe/crm/crm" xmlns="http://www.w3.org/2001/XMLSchema"><import namespace="http://bfv.io/oe/crm"/><element name="getpersons"><complexType><sequence/></complexType></element><element name="getpersonsResponse"><complexType><sequence><element name="result" nillable="true" type="xsd:string"/><element ref="S3:persons"/></sequence></complexType></element></schema>
+<schema elementFormDefault="qualified" targetNamespace="http://bfv.io/oe/crm" xmlns="http://www.w3.org/2001/XMLSchema"><element name="persons" prodata:datasetName="dspersons"><complexType><sequence><element maxOccurs="unbounded" minOccurs="0" name="person" prodata:tableName="ttperson"><complexType><sequence><element name="id" nillable="true" prodata:fieldName="person_id" type="xsd:int"/><element name="firstname" nillable="true" type="xsd:string"/><element name="middlename" nillable="true" type="xsd:string"/><element name="lastname" nillable="true" type="xsd:string"/><element name="birthdate" nillable="true" type="xsd:date"/><element maxOccurs="unbounded" minOccurs="0" name="address" prodata:tableName="ttaddress"><complexType><sequence><element name="id" nillable="true" prodata:fieldName="address_id" type="xsd:int"/><element name="addresstype" nillable="true" type="xsd:int"/><element name="person_id" nillable="true" type="xsd:int"/><element name="street" nillable="true" type="xsd:string"/><element name="housenumber" nillable="true" type="xsd:int"/><element name="addition" nillable="true" type="xsd:string"/><element name="postalcode" nillable="true" type="xsd:string"/><element name="city" nillable="true" type="xsd:string"/><element name="country" nillable="true" type="xsd:string"/></sequence></complexType></element></sequence></complexType></element></sequence></complexType><unique name="person_id" prodata:primaryIndex="true"><selector xpath=".//S3:person"/><field xpath="S3:id"/></unique><unique name="address_id" prodata:primaryIndex="true"><selector xpath=".//S3:address"/><field xpath="S3:id"/></unique><keyref name="person_address" prodata:nested="true" refer="S3:person_id"><selector xpath=".//S3:address"/><field xpath="S3:person_id"/></keyref></element></schema>
+  </wsdl:types>
+  <wsdl:message name="crm_getpersonsResponse">
+    <wsdl:part name="parameters" element="S2:getpersonsResponse"/>
+  </wsdl:message>
+  <wsdl:message name="crm_getpersons">
+    <wsdl:part name="parameters" element="S2:getpersons"/>
+  </wsdl:message>
+  <wsdl:message name="FaultDetailMessage">
+    <wsdl:part name="FaultDetail" element="S1:FaultDetail"/>
+  </wsdl:message>
+  <wsdl:portType name="crmObj">
+    <wsdl:operation name="getpersons">
+      <wsdl:input message="S3:crm_getpersons"/>
+      <wsdl:output message="S3:crm_getpersonsResponse"/>
+      <wsdl:fault name="crmFault" message="S3:FaultDetailMessage"/>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="crmObj" type="S3:crmObj">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="getpersons">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="crmFault">
+        <soap:fault name="crmFault" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="crmService">
+    <wsdl:port name="crmObj" binding="S3:crmObj">
+<wsdl:documentation></wsdl:documentation>
+      <soap:address location="http://localhost:8080/wsa/wsa1"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>
