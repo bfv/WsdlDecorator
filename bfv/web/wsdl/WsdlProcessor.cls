@@ -63,11 +63,11 @@ class bfv.web.wsdl.WsdlProcessor:
   
   method private void loadSourceDocument(wsdl as longchar):
     
-    define variable wsdlfile as character no-undo.
+    define variable wsdlFile as character no-undo.
     
     if (wsdl begins "file:///") then do:
-      wsdlfile = substring(wsdl, if (opsys = "win32") then 9 else 8).
-      copy-lob file wsdlfile to wsdl.
+      wsdlFile = substring(wsdl, if (opsys = "win32") then 9 else 8).
+      copy-lob file wsdlFile to wsdl.
     end.
     
     create x-document sourceDoc.
@@ -109,27 +109,27 @@ class bfv.web.wsdl.WsdlProcessor:
   method private void traverseNode(currentsource as handle, currenttarget as handle):
     
     define variable i as integer no-undo.
-    define variable childnode as handle no-undo.
-    define variable copiednode as handle no-undo.
+    define variable childNode as handle no-undo.
+    define variable copiedNode as handle no-undo.
     define variable pathWasExpanded as logical no-undo.
     
-    create x-noderef copiednode.
+    create x-noderef copiedNode.
     
     pathWasExpanded = addTocurrentPath(currentsource).
     getXmlSchemaPrefix(currentsource).
     
     /* copy first */
-    copiednode = copyNode(currentsource, ?).
-    currenttarget:append-child(copiednode).
+    copiedNode = copyNode(currentsource, ?).
+    currenttarget:append-child(copiedNode).
     
     /* recurse through childs */
     if (currentsource:num-children > 0) then do:
-      create x-noderef childnode.
+      create x-noderef childNode.
       
       do i = 1 to currentsource:num-children:
-        currentsource:get-child(childnode, i).
-        if (childnode:subtype = "element") then 
-          traverseNode(childnode, copiednode). 
+        currentsource:get-child(childNode, i).
+        if (childNode:subtype = "element") then 
+          traverseNode(childNode, copiedNode). 
       end.
     
     end.
@@ -138,8 +138,8 @@ class bfv.web.wsdl.WsdlProcessor:
       removeFromcurrentPath(currentsource).
     
     finally:
-      delete object childnode no-error.
-      delete object copiednode no-error.
+      delete object childNode no-error.
+      delete object copiedNode no-error.
     end.
     
   end method.
