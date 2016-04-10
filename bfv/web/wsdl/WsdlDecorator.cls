@@ -9,8 +9,10 @@
    Notes       : 
  ----------------------------------------------------------------------*/
 
-using bfv.web.wsdl.IWsdlDecorator.
-using bfv.web.wsdl.IWsdlRuleProvider.
+using bfv.web.wsdl.IWsdlDecorator from propath.
+using bfv.web.wsdl.IWsdlRuleProvider from propath.
+using bfv.sys.log.ILogger from propath.
+using bfv.web.wsdl.WsdlAttribute from propath.
 
 block-level on error undo, throw.
 
@@ -22,12 +24,19 @@ class bfv.web.wsdl.WsdlDecorator implements IWsdlDecorator:
     
   define private variable supportedRules as character no-undo.
   define private variable removeAttributes as character no-undo.
+  define private variable logger as ILogger no-undo.
   
     
   constructor WsdlDecorator(provider as IWsdlRuleProvider):
+    this-object(provider, ?).  
+  end. 
+  
+  
+  constructor public WsdlDecorator(provider as IWsdlRuleProvider, loggerIn as ILogger):
     
     removeAttributes = "~~prodata:,nillable".  
     supportedRules = "add,remove,restrict".
+    logger = loggerIn.
     
     provider:GetRules(output table ttwsdlrule).
          
@@ -40,6 +49,9 @@ class bfv.web.wsdl.WsdlDecorator implements IWsdlDecorator:
     define variable numAttributes as integer no-undo.
     define variable attributeName as character no-undo.
     define variable attributeNames as character no-undo.
+    
+    
+    logthis(currentPath).
     
     /* process attributes */
     numAttributes = num-entries(node:attribute-names).
@@ -54,7 +66,7 @@ class bfv.web.wsdl.WsdlDecorator implements IWsdlDecorator:
     end.
 		
     applyRules(node, currentPath).
-        
+    
   end method.
 	
 	
@@ -63,6 +75,7 @@ class bfv.web.wsdl.WsdlDecorator implements IWsdlDecorator:
     define variable i as integer no-undo.
     define variable numRemoveAttributes as integer no-undo.
     define variable removeAttribute as character no-undo.
+    
     
     numRemoveAttributes = num-entries(removeAttributes).
     do i = 1 to numRemoveAttributes:
@@ -100,25 +113,43 @@ class bfv.web.wsdl.WsdlDecorator implements IWsdlDecorator:
   
   method private void applyRemoveRule(node as handle, ruleString as character):
     
-    if (lookup(ruleString, node:attribute-names) > 0) then
+    if (lookup(ruleString, node:attribute-names) > 0) then do:
       node:remove-attribute(ruleString).
+      logthis("  remove: " + ruleString).
+    end.
     
   end method.
 
   
   method private void applyAddRule(node as handle, ruleString as character):
     
-    define variable attributeName  as character no-undo.
-    define variable attributeValue as character no-undo.
+    define variable i as integer no-undo.
+    define variable numRules as integer no-undo.
+    define variable attribute as WsdlAttribute no-undo.
+    define variable currentRule as character no-undo.
     
-    if (num-entries(ruleString, "=") <> 2) then 
-      return.
+    
+    numRules = num-entries(ruleString).
+    rule:
+    do i = 1 to numRules:
       
-    node:set-attribute(
-      entry(1, ruleString, "="),
-      entry(2, ruleString, "=")      
-    ).
+      currentRule = entry(i, ruleString).
+      
+      if (num-entries(currentRule, "=") <> 2) then 
+        next rule.
+      
+      attribute = new WsdlAttribute(entry(1, currentRule, "="), entry(2, currentRule, "=")).
+      processAttribute(attribute).
+      
+      node:set-attribute(
+        attribute:Name,
+        attribute:Value      
+      ).
+      
+      logthis("  add: " + attribute:Name + "=" + attribute:Value).
     
+    end.
+        
   end method.
   
   
@@ -165,6 +196,8 @@ class bfv.web.wsdl.WsdlDecorator implements IWsdlDecorator:
       enumNode = createNode(restrictionNode, "enumeration").
       enumNode:set-attribute("value", trim(entry(i, restrictValues))).
     end.
+    
+    logthis("  restriction: " + restrictValues).
     
     delete object simpleTypeNode no-error.
     delete object restrictionNode no-error.
@@ -215,6 +248,26 @@ class bfv.web.wsdl.WsdlDecorator implements IWsdlDecorator:
   method private logical isPathMatch(currentPath as character, rulePath as character):
     
     return (currentPath = rulePath or currentPath matches rulePath).
+    
+  end method.
+  
+  
+  method private void logthis(logText as character):
+    
+    if (valid-object(logger)) then 
+      logger:Log(logText).
+    
+  end method.
+  
+  
+  method private WsdlAttribute processAttribute(attribute as WsdlAttribute):
+    
+    if (attribute:Name = "required") then do:
+      attribute:Name = "minOccurs".
+      attribute:Value = (if (attribute:Value) = "true" then "1" else "0").
+    end.
+    
+    return attribute.
     
   end method.
   

@@ -12,6 +12,7 @@
 
 interface bfv.web.wsdl.IWsdlDecorator:  
   
+  
   define public property XmlSchemaPrefix as character get. set.
   method public void Decorate(node as handle, currentPath as character).
   
