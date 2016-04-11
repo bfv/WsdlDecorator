@@ -30,7 +30,11 @@ Comma separated list of attributes which will be added to the given path. Name a
 example: `minOccurs=1,maxOccurs=2`
 
 ### restrict ###
-restrict gives the possibility to specify the valid values for an element (commaseparated). If the original element in the WSDL looks like: `<element name="addresstype" nillable="true" type="xsd:int"/>`, a restrict on value 1,2,3 will make the WSDL look like: 
+restrict gives the possibility to specify the valid values for an element (commaseparated). If the original element in the WSDL looks like: 
+```
+<element name="addresstype" nillable="true" type="xsd:int"/>
+```
+a restrict on value 1,2,3 will make the WSDL look like: 
 ```
 <element name="addresstype">
 	<simpleType>
@@ -42,3 +46,14 @@ restrict gives the possibility to specify the valid values for an element (comma
 	</simpleType>
 </element>
 ```
+
+## Rule Providers ##
+A rule provider can be anything which implements the interface `bfv.web.wsdl.IWsdlRuleProvider`. Since there's only one method inside, which is there to return the temp-table ttwsdlrule, the rest of the implementation is whatever you want. There's one provider alredy there, the `WsdlJsonRuleProvider`, which accepts JSON as input data for the temp-table. Setting up a provider can be as simple as:
+```
+define variable provider  as IWsdlRuleProvider no-undo.
+
+provider = new WsdlJsonRuleProvider("./bfv/web/wsdl/sample/person.rules.json").
+``` 
+The purpose of a rule provider is to provide data for the Decorator.
+
+
