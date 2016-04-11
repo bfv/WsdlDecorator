@@ -62,7 +62,7 @@
       <RejectedEndpoint useDefault="true" />
       <Container />
       <AppserverURL>AppServerDC://localhost:3091</AppserverURL>
-      <FileName overWrite="false">crm</FileName>
+      <FileName overWrite="false">wsperson</FileName>
       <ResourceDirectory>/Resources/OpenEdgeServices</ResourceDirectory>
       <SonicAppService useFileSystem="false" deployToDS="false" createXAR="false">
         <ResourceDirectory overWrite="false" />

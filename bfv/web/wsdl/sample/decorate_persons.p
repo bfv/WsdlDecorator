@@ -21,8 +21,8 @@ logger = new Logger("c:/tmp/person.log").
 decorator = new WsdlDecorator(provider, logger).
 parser = new WsdlProcessor().
 
-wsdl = parser:Decorate(decorator, "file:///C:\dev\wsdldecorator\src\wsdldecorator\bfv\web\wsdl\sample\crm.wsdl").
+wsdl = parser:Decorate(decorator, "file:///C:\dev\wsdldecorator\src\wsdldecorator\bfv\web\wsdl\sample\wsperson.wsdl").
 
-copy-lob wsdl to file "C:\dev\wsdldecorator\src\wsdldecorator\bfv\web\wsdl\sample\crm.wsdl.out".
+copy-lob wsdl to file "C:\dev\wsdldecorator\src\wsdldecorator\bfv\web\wsdl\sample\wsperson.wsdl.out".
     
 message "done" view-as alert-box.
