@@ -18,6 +18,7 @@ class bfv.web.wsdl.sample.PersonRuleProvider inherits WsdlRuleProviderBase:
  
   constructor public PersonRuleProvider():
     
+    addRule("/*", "remove", "nillable,~~prodata").
     addRule("/persons/person/firstname", "add", "required=true"). 
     addRule("/persons/person/address", "add", "minOccurss=1,maxOccurs=3").
     addRule("/persons/person/address/addresstype", "restrict", "class=bfv.web.wsdl.sample.AddressTypeEnum:GetValues()").

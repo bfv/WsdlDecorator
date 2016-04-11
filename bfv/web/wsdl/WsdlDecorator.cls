@@ -23,7 +23,6 @@ class bfv.web.wsdl.WsdlDecorator implements IWsdlDecorator:
   define public property XmlSchemaPrefix as character get. set.
     
   define private variable supportedRules as character no-undo.
-  define private variable removeAttributes as character no-undo.
   define private variable logger as ILogger no-undo.
   
     
@@ -34,7 +33,6 @@ class bfv.web.wsdl.WsdlDecorator implements IWsdlDecorator:
   
   constructor public WsdlDecorator(provider as IWsdlRuleProvider, loggerIn as ILogger):
     
-    removeAttributes = "~~prodata:,nillable".  
     supportedRules = "add,remove,restrict".
     logger = loggerIn.
     
@@ -52,48 +50,11 @@ class bfv.web.wsdl.WsdlDecorator implements IWsdlDecorator:
     
     
     logthis(currentPath).
-    
-    /* process attributes */
-    numAttributes = num-entries(node:attribute-names).
-    attributeNames = node:attribute-names.
-    do i = 1 to numAttributes:
-		  
-      attributeName = entry(i, attributeNames).
-		  
-      if (isRemovableAttribute(attributeName)) then 
-        node:remove-attribute(attributeName).
-		    
-    end.
-		
+
     applyRules(node, currentPath).
     
   end method.
 	
-	
-  method private logical isRemovableAttribute(attributeName as character):
-    
-    define variable i as integer no-undo.
-    define variable numRemoveAttributes as integer no-undo.
-    define variable removeAttribute as character no-undo.
-    
-    
-    numRemoveAttributes = num-entries(removeAttributes).
-    do i = 1 to numRemoveAttributes:
-      
-      removeAttribute = entry(i, removeAttributes).
-      
-      if (attributeName = removeAttribute) then 
-        return true.
-        
-      if (removeAttribute begins "~~" and attributeName begins substring(removeAttribute, 2)) then
-        return true.
-      
-    end.
-    
-    return false.
-    
-  end method.
-  
   
   method private void applyRules(node as handle, currentPath as character):
     
@@ -113,9 +74,42 @@ class bfv.web.wsdl.WsdlDecorator implements IWsdlDecorator:
   
   method private void applyRemoveRule(node as handle, ruleString as character):
     
-    if (lookup(ruleString, node:attribute-names) > 0) then do:
-      node:remove-attribute(ruleString).
-      logthis("  remove: " + ruleString).
+    define variable i as integer no-undo.
+    define variable j as integer no-undo.
+    define variable numRules as integer no-undo.
+    define variable numAttributes as integer no-undo.
+    define variable attributes as character no-undo.
+    
+    define variable attributeName as character no-undo.
+    define variable currentRule as character no-undo.
+    define variable removeAttribute as logical no-undo.
+    
+    numAttributes = num-entries(node:attribute-names).
+    attributes = node:attribute-names.
+    
+    numRules = num-entries(ruleString).
+    rule:
+    do i = 1 to numRules:
+      
+      currentRule = entry(i, ruleString).
+      removeAttribute = false.
+      do j = 1 to numAttributes:
+        
+        attributeName = entry(j, attributes).
+        
+        if (attributeName = currentRule) then
+          removeAttribute = true.
+          
+        if (currentRule begins "~~" and attributeName begins substring(currentRule, 2)) then 
+          removeAttribute = true.
+          
+        if (removeAttribute) then do:
+          node:remove-attribute(attributeName).
+          logthis("  remove: " + attributeName).
+        end.
+          
+      end.
+      
     end.
     
   end method.
