@@ -9,7 +9,7 @@
       <VersionString>1.0</VersionString>
       <VersionNumber>1</VersionNumber>
       <Package />
-      <Service>crm</Service>
+      <Service>wsperson</Service>
       <WorkDir>C:\dev\wsdldecorator\src\wsdldecorator\bfv\web\wsdl\sample\</WorkDir>
       <VerboseLogging>true</VerboseLogging>
       <LeaveProxyFiles>true</LeaveProxyFiles>
@@ -75,7 +75,7 @@
         <Password />
       </SonicConnectionInfo>
     </DeploymentWizard>
-    <Name>crm</Name>
+    <Name>wsperson</Name>
     <ProPath>C:\dev\wsdldecorator\src\wsdldecorator\bfv\web\wsdl\sample\</ProPath>
     <HelpString />
     <ODLHelpString />

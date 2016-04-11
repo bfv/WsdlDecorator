@@ -22,7 +22,7 @@ class bfv.web.wsdl.sample.PersonRuleProvider inherits WsdlRuleProviderBase:
     addRule("/persons/person/firstname", "add", "required=true"). 
     addRule("/persons/person/address", "add", "minOccurss=1,maxOccurs=3").
     addRule("/persons/person/address/addresstype", "restrict", "class=bfv.web.wsdl.sample.AddressTypeEnum:GetValues()").
-    
+    //temp-table ttwsdlrule:write-json("file", "c:/tmp/json.out.json").
   end.
   
 end class.

@@ -1,0 +1,22 @@
+{"rules" : [
+  {
+    "rulepath" : "/*",
+    "ruletype" : "remove",
+    "rulevalue" : "nillable,~prodata"
+  },
+  {
+    "rulepath" : "/persons/person/firstname",
+    "ruletype" : "add",
+    "rulevalue" : "required=true"
+  }, 
+  {
+    "rulepath" : "/persons/person/address",
+    "ruletype" : "add",
+    "rulevalue" : "minOccurss=1,maxOccurs=3"
+  }, 
+  {
+    "rulepath" : "/persons/person/address/addresstype",
+    "ruletype" : "restrict",
+    "rulevalue" : "class=bfv.web.wsdl.sample.AddressTypeEnum:GetValues()"
+  }
+]}
