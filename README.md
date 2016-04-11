@@ -56,4 +56,41 @@ provider = new WsdlJsonRuleProvider("./bfv/web/wsdl/sample/person.rules.json").
 ``` 
 The purpose of a rule provider is to provide data for the Decorator.
 
+## Decorators ###
+A decorator is the class which implements the `bfv.web.wsdl.IWsdlDecorator` interface:
+```
+interface bfv.web.wsdl.IWsdlDecorator:  
+  define public property XmlSchemaPrefix as character get. set.
+  method public void Decorate(node as handle, currentPath as character).
+end interface.
+```
 
+the `node` is the xml node in target xml document, the `currentPath` the full path of the node.
+Based on there two parameters the Decorator can perform the rules it received via the Rule Provider. The provider is supplied to the decorator via the constructor of the decorator. Since the WsdlProcessor is only dependent on the `IWsdlDecorator` interface you could supply anything as a decorator. The `bfv.web.wsdl.WsdlDecorator` is a good starting point.
+
+## WsdlProcessor ##
+The class which orchestrates the decoration of the WSDL. It basically copied nodes from the source document to the target document. Furthermore it calls the Decorate method of the provider. The provider is passed to the Processor via the Decorate method:
+```
+method public longchar Decorate(decoratorIn as IWsdlDecorator, wsdlIn as longchar):
+```
+The input parameter can be both the content of a WSDL or a filename. In the latter case it must be prefixed with `file:///`.
+
+## Sample ##
+```
+using bfv.web.wsdl.*. from propath.
+
+define variable decorator as WsdlDecorator no-undo.
+define variable parser as WsdlProcessor no-undo.
+define variable wsdl as longchar no-undo.
+define variable provider as IWsdlRuleProvider no-undo.
+
+
+provider = new WsdlJsonRuleProvider("./bfv/web/wsdl/sample/person.rules.json").
+
+decorator = new WsdlDecorator(provider).
+parser = new WsdlProcessor().
+
+wsdl = parser:Decorate(decorator, "file:///<whatever your root is>\bfv\web\wsdl\sample\wsperson.wsdl").
+
+copy-lob wsdl to file "<whatever your root is>\bfv\web\wsdl\sample\wsperson.decorated.wsdl".
+```
