@@ -78,11 +78,10 @@ class bfv.web.wsdl.WsdlDecorator implements IWsdlDecorator:
     define variable j as integer no-undo.
     define variable numRules as integer no-undo.
     define variable numAttributes as integer no-undo.
-    define variable attributes as character no-undo.
-    
+    define variable attributes as character no-undo.   
     define variable attributeName as character no-undo.
     define variable currentRule as character no-undo.
-    define variable removeAttribute as logical no-undo.
+    
     
     numAttributes = num-entries(node:attribute-names).
     attributes = node:attribute-names.
@@ -92,18 +91,10 @@ class bfv.web.wsdl.WsdlDecorator implements IWsdlDecorator:
     do i = 1 to numRules:
       
       currentRule = entry(i, ruleString).
-      removeAttribute = false.
       do j = 1 to numAttributes:
         
         attributeName = entry(j, attributes).
-        
-        if (attributeName = currentRule) then
-          removeAttribute = true.
-          
-        if (currentRule begins "~~" and attributeName begins substring(currentRule, 2)) then 
-          removeAttribute = true.
-          
-        if (removeAttribute) then do:
+        if (attributeName matches currentRule) then do:
           node:remove-attribute(attributeName).
           logthis("  remove: " + attributeName).
         end.
@@ -178,6 +169,7 @@ class bfv.web.wsdl.WsdlDecorator implements IWsdlDecorator:
     define variable i as integer no-undo.
     define variable numValues as integer no-undo.
     
+
     simpleTypeNode = createNode(node, "simpleType").
     
     nodeType = node:get-attribute("type").
