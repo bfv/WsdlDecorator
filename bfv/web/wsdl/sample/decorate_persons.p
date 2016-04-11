@@ -23,6 +23,6 @@ parser = new WsdlProcessor().
 
 wsdl = parser:Decorate(decorator, "file:///C:\dev\wsdldecorator\src\wsdldecorator\bfv\web\wsdl\sample\wsperson.wsdl").
 
-copy-lob wsdl to file "C:\dev\wsdldecorator\src\wsdldecorator\bfv\web\wsdl\sample\wsperson.wsdl.out".
+copy-lob wsdl to file "C:\dev\wsdldecorator\src\wsdldecorator\bfv\web\wsdl\sample\wsperson.decorated.wsdl".
     
 message "done" view-as alert-box.

@@ -2,7 +2,7 @@
   {
     "rulepath" : "/*",
     "ruletype" : "remove",
-    "rulevalue" : "nillable,~prodata"
+    "rulevalue" : "nillable,prodata*"
   },
   {
     "rulepath" : "/persons/person/firstname",
@@ -12,7 +12,7 @@
   {
     "rulepath" : "/persons/person/address",
     "ruletype" : "add",
-    "rulevalue" : "minOccurss=1,maxOccurs=3"
+    "rulevalue" : "minOccurs=1,maxOccurs=3"
   }, 
   {
     "rulepath" : "/persons/person/address/addresstype",
