@@ -47,6 +47,14 @@ a restrict on value 1,2,3 will make the WSDL look like:
 </element>
 ```
 
+a restriction can also have a value which looks like: 
+```
+class:bfv.crm.AddressTypeEnum:Values
+class:bfv.crm.AddressTypeEnum:GetValues()
+```
+
+The above sample works voor static properties and methods right now. If the restriction ends with () it expected to be a method, otherwise a property. 
+
 ## Rule Providers ##
 A rule provider can be anything which implements the interface `bfv.web.wsdl.IWsdlRuleProvider`. Since there's only one method inside, which is there to return the temp-table ttwsdlrule, the rest of the implementation is whatever you want. There's one provider alredy there, the `WsdlJsonRuleProvider`, which accepts JSON as input data for the temp-table. Setting up a provider can be as simple as:
 ```
