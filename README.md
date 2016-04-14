@@ -81,7 +81,7 @@ The class which orchestrates the decoration of the WSDL. It basically copied nod
 ```
 method public longchar Decorate(decoratorIn as IWsdlDecorator, wsdlIn as longchar):
 ```
-The input parameter can be both the content of a WSDL or a filename. In the latter case it must be prefixed with `file:///`.
+The input parameter can be both the content of a WSDL or a filename. In the latter case it must be prefixed with `file:///`. Currently only elements which have a `name` attribute are passed to the decorator.
 
 ## Sample ##
 ```
@@ -102,3 +102,19 @@ wsdl = parser:Decorate(decorator, "file:///<whatever your root is>\bfv\web\wsdl\
 
 copy-lob wsdl to file "<whatever your root is>\bfv\web\wsdl\sample\wsperson.decorated.wsdl".
 ```
+
+### Logging ###
+Sometimes it can be useful to see what the actions of the decorator are. It is possible to pass a logger to the constructor of the decorator:
+```
+using bfv.web.wsdl.*. from propath.
+using bfv.sys.*. from propath.
+
+define variable logger as ILogger no-undo.
+
+...
+
+logger = new Logger("c:/temp/wsdldecoration.log").
+decorator = new WsdlDecorator(provider, logger).
+```
+
+Anything which satisfies the `bfv.sys.ILogger` interface is usable. The supplied `bfv.sys.Logger` write to the specified file.
